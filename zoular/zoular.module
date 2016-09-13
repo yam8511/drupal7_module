@@ -1,0 +1,100 @@
+<?php
+/**
+ * @file
+ * A block module that User can use some function to set rate or add account.
+ */
+
+/**
+ * Implements hook_help().
+ *
+ * Displays help and module information.
+ *
+ * @param path 
+ *   Which path of the site we're using to display help
+ * @param arg 
+ *   Array that holds the current path as returned from arg() function
+ */
+function zoular_help($path, $arg)
+{
+	switch ($path) {
+		case "admin/help#zoular":
+			return '<p>' . t("Set rate & add account below") . '</p>';
+			break;
+	}
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function zoular_block_info()
+{
+	$blocks['zoular_setting'] = array(
+		// The name that will appear in the block list.
+		'info' => t('zoular_block for setting rate'),
+		// Default setting.
+		'cache' => DRUPAL_CACHE_PER_ROLE,
+	);
+	return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ * 用來呈現Block樣貌
+ */
+function zoular_block_view($delta = '')
+{
+	### case 的名稱要與block_info 一樣
+	switch ($delta) {
+		case 'zoular_setting':
+			$block['subject'] = t('Rate Setting');
+			$result = zoular_contents(1);
+
+			$output = '<table>';
+			foreach ($result as $r) {
+				$output .= '<tr><td>'.$r->name.'</td><td>'.$r->cost.'</td></tr>';
+			}
+			$output .= '</table>';
+
+			$block['content'] = $output;
+			return $block;
+			break;
+	}
+}
+
+function zoular_contents($id=0)
+{
+	//Use Database API to retrieve current posts.
+	if (!$id) {
+		$query = db_select('zoular_rate', 'n')
+		->fields('n', array('id', 'name', 'cost', 'up'))
+		->execute(); 
+	}
+	else {
+		$query = db_select('zoular_rate', 'n')
+		->fields('n', array('id', 'name', 'cost', 'up'))
+		->condition('id', $id)
+		->execute(); 
+	}
+
+	return $query;
+}
+
+/**
+* Implements hook_menu().
+*/
+function zoular_menu() {
+    $items = array();    
+
+    $items['zoular_setting'] = array(
+        'title' => 'Zoular Setting',
+        'page callback' => '_current_all_page',
+        'access arguments' => array('access content'),
+        'type' => MENU_NORMAL_ITEM, //Will appear in Navigation menu.
+      );
+    return $items;
+}
+
+function _zoular_all_page()
+{
+	$result = zoular_contents();
+}

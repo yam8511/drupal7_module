@@ -1,0 +1,9 @@
+name = Zoular
+description = A block module that User can use some function to set rate or add account.
+core = 7.x
+
+; Configure Route
+;configure = admin/config/content/zoular
+
+; Other files
+;files[] = zoular.test
