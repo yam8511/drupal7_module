@@ -87,7 +87,7 @@ function zoular_menu() {
 
     $items['zoular_setting'] = array(
         'title' => 'Zoular Setting',
-        'page callback' => '_current_all_page',
+        'page callback' => '_zoular_all_page',
         'access arguments' => array('access content'),
         'type' => MENU_NORMAL_ITEM, //Will appear in Navigation menu.
       );
@@ -97,4 +97,19 @@ function zoular_menu() {
 function _zoular_all_page()
 {
 	$result = zoular_contents();
+	$items = array();
+  	//Iterate over the resultset and format as links.
+  	foreach ($result as $node) {
+    		$items[] = array(
+    			'data' => l($node->name, 'node/' . $node->cost),
+    		);
+    	}
+	
+	$page_array['zoular_arguments'] = array(
+      '#title' => t('All rate setting'),
+      '#items' => $items,
+      //Theme hook with suggestion.  
+      '#theme' => 'item_list__zoular',
+    );
+    return $page_array;
 }
